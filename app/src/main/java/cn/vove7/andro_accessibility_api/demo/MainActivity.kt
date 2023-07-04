@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val actions = mutableListOf(
+            ToWechat(),
             BaseNavigatorAction(),
             PickScreenText(),
             SiblingTestAction(),
