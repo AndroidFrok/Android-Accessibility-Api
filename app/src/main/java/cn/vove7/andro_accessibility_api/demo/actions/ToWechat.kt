@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import cn.vove7.andro_accessibility_api.demo.toast
+import cn.vove7.auto.core.api.editor
 import cn.vove7.auto.core.api.waitForApp
 import cn.vove7.auto.core.api.withId
 import kotlinx.coroutines.delay
@@ -24,9 +25,22 @@ class ToWechat : Action() {
         if (waitForApp(targetApp, 5000).also {
                 toast("wait " + if (it) "success" else "failed")
             }) {
-//            var issss = withId("j5t").tryClick()
-            var issss = withId("ij").tryClick()
+            var issss = withId("gsl").tryClick()
+            delay(1000)
+//            var issss = withId("").tryClick()  //j5t  f15   2023年7月14日16:02:45测试结果：gsl 为搜索按钮   ij
             Timber.d("" + issss)
+            editor().require().apply {
+//                delay(500)
+                text = "lisha"
+                delay(1000)
+//                withId("c2h").tryClick()
+                withId("j63").tryClick()
+//                appendText("lisha")
+//                clearSelection()
+//                clearFocus()
+            }
+
+
         }
     }
 }

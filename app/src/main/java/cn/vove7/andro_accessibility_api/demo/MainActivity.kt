@@ -24,16 +24,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val actions = mutableListOf(
-            ToWechat(),
+            ToWechat(),//1
             BaseNavigatorAction(),
             PickScreenText(),
             SiblingTestAction(),
-            DrawableAction(),
+            DrawableAction(),//5
             WaitAppAction(),
             SelectTextAction(),
             ViewFinderWithLambda(),
             TextMatchAction(),
-            ClickTextAction(),
+            ClickTextAction(),//10
             TraverseAllAction(),
             SmartFinderAction(),
             CoroutineStopAction(),

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cn.vove7.andro_accessibility_api.demo">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

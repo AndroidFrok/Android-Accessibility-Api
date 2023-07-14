@@ -275,7 +275,7 @@ class SelectTextAction : Action() {
 
     override suspend fun run(act: ComponentActivity) {
         editor().require().apply {
-            repeat(5) {
+            repeat(2) {
                 appendText(".x")
                 delay(500)
             }
