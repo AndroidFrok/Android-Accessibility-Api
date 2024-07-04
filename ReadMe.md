@@ -1,3 +1,6 @@
+
+1.accessibility-api 引用了 core  ，app 引用了uiauto、accessibility-api  ， uiauto引用了 core  ，
+
 # Android-Accessibility-Api
 
 [![](https://jitpack.io/v/Krosxx/Android-Auto-Api.svg)](https://jitpack.io/#/Android-Krosxx-Api)

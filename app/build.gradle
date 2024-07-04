@@ -57,5 +57,6 @@ dependencies {
     implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
     implementation project(':accessibility-api')
-    implementation project(':uiauto')
+    api project(':uiauto')
+
 }
