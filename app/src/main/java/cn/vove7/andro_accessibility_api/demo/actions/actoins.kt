@@ -10,6 +10,7 @@ import android.util.Pair
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
@@ -18,6 +19,7 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import cn.vove7.andro_accessibility_api.demo.*
+import cn.vove7.andro_accessibility_api.requireBaseAccessibility
 import cn.vove7.auto.core.AutoApi
 import cn.vove7.auto.core.api.*
 import cn.vove7.auto.core.requireAutoService
@@ -39,8 +41,33 @@ import kotlin.coroutines.coroutineContext
 class BaseNavigatorAction : Action() {
     override val name: String get() = "基础导航"
 
+    /**
+     * 微信主页面的“搜索”按钮id
+     */
+    private val SEARCH_ID = "com.tencent.mm:id/ij";
+
+    /**
+     * 微信主页面bottom的“微信”按钮id
+     */
+    private val WECHAT_ID = "com.tencent.mm:id/d3t";
+
+    /**
+     * 微信搜索页面的输入框id
+     */
+    private val EDIT_TEXT_ID = "com.tencent.mm:id/ka";
+
+    /**
+     * 微信搜索页面活动id
+     */
+    private val SEARCH_ACTIVITY_NAME = "com.tencent.mm.plugin.fts.ui.FTSMainUI";
+
+    private val LIST_VIEW_NAME = "android.widget.ListView";
     override suspend fun run(act: ComponentActivity) {
         requireAutoService()
+        run2(act)
+    }
+
+    suspend fun run1() {
         toast("下拉通知栏..")
         pullNotificationBar()
         delay(1000)
@@ -66,6 +93,49 @@ class BaseNavigatorAction : Action() {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
     }
+
+    val targetApp = "com.tencent.mm"
+
+    /**
+     *  https://www.cnblogs.com/lanxingren/p/10299481.html
+     */
+    suspend fun run2(act: ComponentActivity) {
+        requireBaseAccessibility()
+
+
+
+        toast("start chrome after 1s")
+        delay(1000)
+//打开Chrome
+        val targetApp = "com.tencent.mm"
+        act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
+//等待页面
+        if (waitForApp(targetApp, 5000).also {
+                toast("wait " + if (it) "success" else "failed")
+            }) {
+            //id 搜索，点击打开菜单
+            //自定义条件搜索
+            val s = findAllWith {
+                it.isClickable
+            }.joinToString("\n\n")
+
+            withContext(Dispatchers.Main) {
+
+                withId("$targetApp:id/gsl").tryClick()
+
+
+
+                /*AlertDialog.Builder(act).apply {
+                    setTitle("可点击节点：")
+                    setMessage(s)
+                    show()
+                }*/
+            }
+
+        }
+
+
+    }
 }
 
 class PickScreenText : Action() {
@@ -84,7 +154,7 @@ class PickScreenText : Action() {
     }
 }
 
-class SiblingTestAction :Action() {
+class SiblingTestAction : Action() {
     override val name: String = "SiblingTest"
 
     override suspend fun run(act: ComponentActivity) {
@@ -113,12 +183,9 @@ class DrawableAction : Action() {
         // 指定点转路径手势
         if (!gesture(
                 2000L, arrayOf(
-                100 t 100,
-                100 t 200,
-                200 t 200,
-                200 t 100,
-                100 t 100
-            ))
+                    100 t 100, 100 t 200, 200 t 200, 200 t 100, 100 t 100
+                )
+            )
         ) {
             toast("打断")
         }
@@ -149,16 +216,22 @@ class DrawableAction : Action() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private suspend fun scaleGesture() {
-        if (!gestures(800, arrayOf(
-                arrayOf(Pair(200, 200), Pair(100, 100)),
-                arrayOf(Pair(220, 220), Pair(300, 300)),
-            ))) {
+        if (!gestures(
+                800, arrayOf(
+                    arrayOf(Pair(200, 200), Pair(100, 100)),
+                    arrayOf(Pair(220, 220), Pair(300, 300)),
+                )
+            )
+        ) {
             toast("scaleGesture 失败")
         }
-        if (!gestures(800, arrayOf(
-                arrayOf(Pair(200, 200), Pair(100, 100)).reversedArray(),
-                arrayOf(Pair(220, 220), Pair(300, 300)).reversedArray(),
-            ))) {
+        if (!gestures(
+                800, arrayOf(
+                    arrayOf(Pair(200, 200), Pair(100, 100)).reversedArray(),
+                    arrayOf(Pair(220, 220), Pair(300, 300)).reversedArray(),
+                )
+            )
+        ) {
             toast("scaleGesture 失败")
         }
     }
@@ -212,11 +285,9 @@ class WaitAppAction : Action() {
         val targetApp = "com.android.chrome"
         act.startActivity(act.packageManager.getLaunchIntentForPackage(targetApp))
 
-        if (
-            waitForApp(targetApp, 5000).also {
+        if (waitForApp(targetApp, 5000).also {
                 toast("wait " + if (it) "success" else "failed")
-            }
-        ) {
+            }) {
             withId("menu_button").tryClick()
         }
     }
@@ -327,8 +398,7 @@ class TraverseAllAction : Action() {
     override suspend fun run(act: ComponentActivity) {
 
         Log.i(
-            "TraverseAllAction",
-            findAllWith {
+            "TraverseAllAction", findAllWith {
                 it.contentDescription != null
             }.joinToString("\n")
         )
@@ -369,8 +439,7 @@ class SmartFinderAction : Action() {
         val s = SF.findByDepths(1, 0, 0)
         sb.appendLine(s?.toString())
 
-        (SF where text("1111") or text("2222")
-            and id("111") or longClickable()).findAll()
+        (SF where text("1111") or text("2222") and id("111") or longClickable()).findAll()
 
 
         SF.where {
@@ -381,9 +450,7 @@ class SmartFinderAction : Action() {
         // SF.id("view_id").or().matchText("[0-9]+").find()
 
         // group  (text=="111" && desc=="111") || (text=="222" && desc=="222")
-        SF.where(SF.text("111").desc("111"))
-            .or(SF.text("222").desc("222"))
-            .find()
+        SF.where(SF.text("111").desc("111")).or(SF.text("222").desc("222")).find()
 
         AlertDialog.Builder(act).apply {
             setTitle("Output")
@@ -515,11 +582,9 @@ class InstrumentationShotScreenAction(
         val screen = AutoApi.takeScreenshot()
         Timber.i("screen: $screen")
         withContext(Dispatchers.Main) {
-            AlertDialog.Builder(act)
-                .setTitle("截屏结果")
-                .setView(ImageView(act).also {
-                    it.setImageBitmap(screen)
-                }).show()
+            AlertDialog.Builder(act).setTitle("截屏结果").setView(ImageView(act).also {
+                it.setImageBitmap(screen)
+            }).show()
         }
     }
 }
@@ -530,12 +595,13 @@ class InstrumentationInjectInputEventAction(
     override suspend fun run(act: ComponentActivity) {
         var t = SystemClock.uptimeMillis()
         repeat(100) {
-            val d = buildMotionEvent(t,
-                when (it) {
+            val d = buildMotionEvent(
+                t, when (it) {
                     0 -> MotionEvent.ACTION_DOWN
                     99 -> MotionEvent.ACTION_UP
                     else -> MotionEvent.ACTION_MOVE
-                }, 100f, 5f * it)
+                }, 100f, 5f * it
+            )
             AutoApi.injectInputEvent(d, false)
             delay(10)
         }
@@ -605,7 +671,8 @@ class ContinueGestureAction(override val name: String = "ContinueGesture") : Act
         val stroke = AutoGestureDescription.StrokeDescription(p1, 0, 600, true)
         Timber.i("stroke id: ${stroke.id}")
         AutoApi.doGesturesAsync(
-            AutoGestureDescription.Builder().addStroke(stroke).build(), null, null)
+            AutoGestureDescription.Builder().addStroke(stroke).build(), null, null
+        )
         delay(2000)
 
         val p2 = Path().apply {
@@ -616,7 +683,8 @@ class ContinueGestureAction(override val name: String = "ContinueGesture") : Act
         val continueStroke = stroke.continueStroke(p2, 0, 600, false)
         Timber.i("continuedStrokeId: ${continueStroke.continuedStrokeId}")
         AutoApi.doGesturesAsync(
-            AutoGestureDescription.Builder().addStroke(continueStroke).build(), null, null)
+            AutoGestureDescription.Builder().addStroke(continueStroke).build(), null, null
+        )
         delay(1500)
     }
 }
